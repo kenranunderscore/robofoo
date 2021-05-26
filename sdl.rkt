@@ -1,7 +1,8 @@
 #lang racket
 
 (provide with-init!
-         with-window!)
+         with-window!
+         with-renderer!)
 
 (require
  (prefix-in sdl2: sdl2/pretty))
@@ -31,4 +32,10 @@
     (λ ()
        (sdl2:create-window! title x y w h flags))
     sdl2:destroy-window!
+    body ...))
+
+(define-syntax-rule (with-renderer! renderer-id window body ...)
+  (with-named-resource! renderer-id
+    (λ () (sdl2:create-renderer! window -1 empty))
+    sdl2:destroy-renderer!
     body ...))

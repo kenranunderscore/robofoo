@@ -47,16 +47,19 @@
        (game:game-state-robots-with-state gs)))
 
 (define (main)
-  (sdl:with-init! '(video)
-    (sdl:with-window! window "abc" 0 0 1024 768 empty
-      (let* ((renderer (sdl2:create-renderer! window -1 '())))
-        (define (game-loop gs)
-          (sdl2:set-render-draw-color! renderer 30 30 30 255)
-          (sdl2:render-clear! renderer)
-          (draw-game renderer gs)
-          (sdl2:render-present! renderer))
-        (game-loop initial-game-state)
-        (sdl2:delay! 2000)
-        (sdl2:destroy-renderer! renderer)))))
+  (sdl:with-init!
+   '(video)
+   (sdl:with-window!
+    window "abc" 0 0 1024 768 empty
+    (sdl:with-renderer!
+     renderer window
+     (define (game-loop gs)
+       (sdl2:set-render-draw-color! renderer 30 30 30 255)
+       (sdl2:render-clear! renderer)
+       (draw-game renderer gs)
+       (sdl2:render-present! renderer))
+     (game-loop initial-game-state)
+     (sdl2:delay! 2000)
+     (sdl2:destroy-renderer! renderer)))))
 
 (main)
