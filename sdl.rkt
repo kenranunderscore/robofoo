@@ -26,20 +26,31 @@
 (define-syntax-rule (with-init! flags body ...)
   (with-resource!
     (λ ()
+       (displayln "Initializing SDL…")
        (sdl2:set-main-ready!)
-       (sdl2:init! flags))
-    (const (sdl2:quit!))
+       (sdl2:init! flags)
+       (displayln "SDL initialized"))
+    (λ (_)
+       (displayln "Quitting SDL…")
+       (sdl2:quit!))
     body ...))
 
 (define-syntax-rule (with-window! id title x y w h flags body ...)
   (with-named-resource! id
     (λ ()
+       (displayln "Creating game window…")
        (sdl2:create-window! title x y w h flags))
-    sdl2:destroy-window!
+    (λ (window)
+       (displayln "Destroying window…")
+       (sdl2:destroy-window! window))
     body ...))
 
 (define-syntax-rule (with-renderer! renderer-id window body ...)
   (with-named-resource! renderer-id
-    (λ () (sdl2:create-renderer! window -1 empty))
-    sdl2:destroy-renderer!
+    (λ ()
+       (displayln "Creating renderer…")
+       (sdl2:create-renderer! window -1 empty))
+    (λ (renderer)
+       (displayln "Destroying renderer…")
+       (sdl2:destroy-renderer! renderer))
     body ...))
