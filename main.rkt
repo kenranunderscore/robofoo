@@ -44,24 +44,30 @@
   (map (λ (rws) (draw-robot renderer rws))
        (game:game-state-robots-with-state gs)))
 
+;; FIXME handle return value and errors
+(define-syntax-rule (with-sdl flags body ...)
+  (begin
+    (sdl2:set-main-ready!)
+    (sdl2:init! flags)
+    body ...
+    (sdl2:quit!)))
+
 ;; FIXME handle exceptions
 (define (cleanup! renderer window)
   (sdl2:destroy-renderer! renderer)
-  (sdl2:destroy-window! window)
-  (sdl2:quit!))
+  (sdl2:destroy-window! window))
 
 (define (main)
-  (sdl2:set-main-ready!)
-  (sdl2:init! '(video))
-  (let* ((window (sdl2:create-window! "Hello world" 0 0 600 400 '()))
-         (renderer (sdl2:create-renderer! window -1 '())))
-    (define (game-loop gs)
-      (sdl2:set-render-draw-color! renderer 30 30 30 255)
-      (sdl2:render-clear! renderer)
-      (draw-game renderer gs)
-      (sdl2:render-present! renderer))
-    (game-loop initial-game-state)
-    (sdl2:delay! 2000)
-    (cleanup! renderer window)))
+  (with-sdl '(video)
+    (let* ((window (sdl2:create-window! "Hello world" 0 0 600 400 '()))
+           (renderer (sdl2:create-renderer! window -1 '())))
+      (define (game-loop gs)
+        (sdl2:set-render-draw-color! renderer 30 30 30 255)
+        (sdl2:render-clear! renderer)
+        (draw-game renderer gs)
+        (sdl2:render-present! renderer))
+      (game-loop initial-game-state)
+      (sdl2:delay! 2000)
+      (cleanup! renderer window))))
 
 (main)
