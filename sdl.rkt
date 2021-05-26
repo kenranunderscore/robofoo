@@ -12,7 +12,11 @@
 (define-syntax-rule (with-named-resource! resource-id acquire release body ...)
   (let ((resource-id (acquire)))
     ;; Release the resource if anything happens
-    (with-handlers (((const true) (λ (exn) (release resource-id))))
+    (with-handlers (((const true)
+                     (λ (exn)
+                        (displayln "Encountered the following runtime error:")
+                        (displayln exn)
+                        (release resource-id))))
       body ...
       (release resource-id))))
 
