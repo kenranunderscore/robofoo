@@ -3,7 +3,9 @@
 (provide with-init!
          with-window!
          with-renderer!
-         poll-event!)
+         poll-event!
+         event-type
+         event-keysym)
 
 (require
  (prefix-in sdl2: sdl2/pretty)
@@ -63,3 +65,11 @@
 (define (poll-event!)
   (sdl2:poll-event! event-ptr)
   (ffi:ptr-ref event-ptr sdl2:_event))
+
+(define (event-type event)
+  (ffi:union-ref event 0))
+
+(define (event-keysym event)
+  (sdl2:keysym-sym
+   (sdl2:keyboard-event-keysym
+    (ffi:union-ref event 4))))

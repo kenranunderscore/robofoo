@@ -2,7 +2,6 @@
 
 (require
  (prefix-in sdl2: sdl2/pretty)
- (prefix-in ffi: ffi/unsafe)
  (prefix-in game: "game.rkt")
  (prefix-in sdl: "sdl.rkt"))
 
@@ -46,9 +45,9 @@
        (game:game-state-robots-with-state gs)))
 
 (define (handle-event event)
-  (case (ffi:union-ref event 0)
+  (case (sdl:event-type event)
     ((key-down)
-     (case (sdl2:keysym-sym (sdl2:keyboard-event-keysym (ffi:union-ref event 4)))
+     (case (sdl:event-keysym event)
        ((escape)
         (displayln "ESC pressed")
         true)
