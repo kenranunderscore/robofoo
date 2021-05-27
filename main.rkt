@@ -32,6 +32,24 @@
 
 (define initial-game-state (game:game-state 0 robots-with-state))
 
+(define (advance-position pos)
+  (struct-copy game:position pos (x (+ 1 (game:position-x pos)))))
+
+(define (advance rws)
+  (define s (game:robot-with-state-state rws))
+  (define next-state (struct-copy game:robot-state
+                                  s
+                                  (pos (advance-position (game:robot-state-pos s)))))
+  (struct-copy game:robot-with-state rws (state next-state)))
+
+(define (advance-one-tick current-game-state)
+  (define current-tick (game:game-state-tick current-game-state))
+  (define rwss (game:game-state-robots-with-state current-game-state))
+  (struct-copy game:game-state
+               current-game-state
+               (tick (+ 1 current-tick))
+               (robots-with-state (map advance rwss))))
+
 (define (draw-robot renderer rws)
   (let* ((p (game:robot-state-pos (game:robot-with-state-state rws)))
          (color (game:robot-color (game:robot-with-state-robot rws)))
@@ -63,14 +81,14 @@
           _pointer sdl2:_event*))
   ;; FIXME call/cc!?
   (letrec ((go (λ (current-state)
-                 (sdl2:wait-event! event-ptr)
+                 (sdl2:poll-event! event-ptr)
                  (define event (ptr-ref event-ptr sdl2:_event))
                  (unless (handle-event event)
                    (sdl2:set-render-draw-color! renderer 30 30 30 255)
                    (sdl2:render-clear! renderer)
                    (draw-game renderer current-state)
                    (sdl2:render-present! renderer)
-                   (go current-state)))))
+                   (go (advance-one-tick current-state))))))
     (go initial-game-state)))
 
 (define (main)
