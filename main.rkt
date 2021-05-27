@@ -2,7 +2,7 @@
 
 (require
  (prefix-in sdl2: sdl2/pretty)
- ffi/unsafe
+ (prefix-in ffi: ffi/unsafe)
  (prefix-in game: "game.rkt")
  (prefix-in sdl: "sdl.rkt"))
 
@@ -64,9 +64,9 @@
        (game:game-state-robots-with-state gs)))
 
 (define (handle-event event)
-  (case (union-ref event 0)
+  (case (ffi:union-ref event 0)
     ((key-down)
-     (case (sdl2:keysym-sym (sdl2:keyboard-event-keysym (union-ref event 4)))
+     (case (sdl2:keysym-sym (sdl2:keyboard-event-keysym (ffi:union-ref event 4)))
        ((escape)
         (displayln "ESC pressed")
         true)
@@ -74,13 +74,9 @@
     (else false)))
 
 (define (game-loop renderer)
-  (define event-ptr
-    (cast (malloc (ctype-sizeof sdl2:_event))
-          _pointer sdl2:_event*))
   ;; FIXME call/cc!?
   (letrec ((go (λ (current-state)
-                 (sdl2:poll-event! event-ptr)
-                 (define event (ptr-ref event-ptr sdl2:_event))
+                 (define event (sdl:poll-event!))
                  (unless (handle-event event)
                    (sdl2:set-render-draw-color! renderer 30 30 30 255)
                    (sdl2:render-clear! renderer)

@@ -2,10 +2,12 @@
 
 (provide with-init!
          with-window!
-         with-renderer!)
+         with-renderer!
+         poll-event!)
 
 (require
- (prefix-in sdl2: sdl2/pretty))
+ (prefix-in sdl2: sdl2/pretty)
+ (prefix-in ffi: ffi/unsafe))
 
 ;; FIXME handle return values from SDL2 calls
 
@@ -54,3 +56,10 @@
        (displayln "Destroying renderer…")
        (sdl2:destroy-renderer! renderer))
     body ...))
+
+(define event-ptr (ffi:cast (ffi:malloc (ffi:ctype-sizeof sdl2:_event))
+                            ffi:_pointer sdl2:_event*))
+
+(define (poll-event!)
+  (sdl2:poll-event! event-ptr)
+  (ffi:ptr-ref event-ptr sdl2:_event))
