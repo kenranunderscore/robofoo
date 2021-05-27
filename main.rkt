@@ -2,6 +2,7 @@
 
 (require
  (prefix-in sdl2: sdl2/pretty))
+(require ffi/unsafe)
 (require
  (prefix-in game: "game.rkt"))
 (require
@@ -46,6 +47,32 @@
   (map (λ (rws) (draw-robot renderer rws))
        (game:game-state-robots-with-state gs)))
 
+(define (handle-event event)
+  (case (union-ref event 0)
+    ((key-down)
+     (case (sdl2:keysym-sym (sdl2:keyboard-event-keysym (union-ref event 4)))
+       ((escape)
+        (displayln "ESC pressed")
+        true)
+       (else false)))
+    (else false)))
+
+(define (game-loop renderer)
+  (define event-ptr
+    (cast (malloc (ctype-sizeof sdl2:_event))
+          _pointer sdl2:_event*))
+  ;; FIXME call/cc!?
+  (letrec ((go (λ (current-state)
+                 (sdl2:wait-event! event-ptr)
+                 (define event (ptr-ref event-ptr sdl2:_event))
+                 (unless (handle-event event)
+                   (sdl2:set-render-draw-color! renderer 30 30 30 255)
+                   (sdl2:render-clear! renderer)
+                   (draw-game renderer current-state)
+                   (sdl2:render-present! renderer)
+                   (go current-state)))))
+    (go initial-game-state)))
+
 (define (main)
   (sdl:with-init!
    '(video)
@@ -53,12 +80,7 @@
     window "abc" 0 0 1024 768 empty
     (sdl:with-renderer!
      renderer window
-     (define (game-loop gs)
-       (sdl2:set-render-draw-color! renderer 30 30 30 255)
-       (sdl2:render-clear! renderer)
-       (draw-game renderer gs)
-       (sdl2:render-present! renderer))
-     (game-loop initial-game-state)
+     (game-loop renderer)
      (sdl2:delay! 2000)
      (sdl2:destroy-renderer! renderer)))))
 
