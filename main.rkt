@@ -1,11 +1,9 @@
 #lang racket
 
 (require
- (prefix-in sdl2: sdl2/pretty))
-(require ffi/unsafe)
-(require
- (prefix-in game: "game.rkt"))
-(require
+ (prefix-in sdl2: sdl2/pretty)
+ ffi/unsafe
+ (prefix-in game: "game.rkt")
  (prefix-in sdl: "sdl.rkt"))
 
 (define robot-1
