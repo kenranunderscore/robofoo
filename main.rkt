@@ -93,7 +93,6 @@
     (sdl:with-renderer!
      renderer window
      (game-loop renderer)
-     (sdl2:delay! 2000)
      (sdl2:destroy-renderer! renderer)))))
 
 (main)
