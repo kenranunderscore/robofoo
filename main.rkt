@@ -6,15 +6,15 @@
  (prefix-in sdl: "sdl.rkt"))
 
 (define robot-1
-  (game:robot (λ (event _)
-                 (print "foo")
-                 (print event))
+  (game:robot (const 0)
+              (λ (_event _rs is)
+                 (+ 2 is))
               (game:color 30 150 90)))
 
 (define robot-2
-  (game:robot (λ (event _)
-                 (print "foo")
-                 (print event))
+  (game:robot (λ (rs)
+                 (game:position-x (game:robot-state-pos rs)))
+              (λ (_event _rs is) is)
               (game:color 0 100 200)))
 
 (define robot-state-1
@@ -24,8 +24,12 @@
   (game:robot-state (game:position 100 190) 100))
 
 (define robots-with-state
-  (list (game:robot-with-state robot-1 robot-state-1)
-        (game:robot-with-state robot-2 robot-state-2)))
+  (list (game:robot-with-state robot-1
+                               robot-state-1
+                               ((game:robot-make-initial-state robot-1) robot-state-1))
+        (game:robot-with-state robot-2
+                               robot-state-2
+                               ((game:robot-make-initial-state robot-2) robot-state-2))))
 
 (define initial-game-state (game:game-state 0 robots-with-state))
 
@@ -64,6 +68,7 @@
                    (sdl2:render-clear! renderer)
                    (draw-game renderer current-state)
                    (sdl2:render-present! renderer)
+                   ;; Alternatively: current-game-step and advance only a single one?
                    (go (game:advance current-state))))))
     (go initial-game-state)))
 
