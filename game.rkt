@@ -15,6 +15,7 @@
 (struct color (r g b))
 
 ;; FIXME color -> robot-configuration
+;; FIXME game configuration (field size, robot size, ...)
 
 ;; A robot consists of the the following:
 ;; - A function to create some self-managed state given its initial
@@ -29,16 +30,44 @@
 (struct tick-event (tick))
 (struct game-state (tick robots-with-state))
 
+;; FIXME use match
+
+(define (action->state-update action)
+  (λ (rs)
+     (define current-position (robot-state-pos rs))
+     (define next-pos
+       (case action
+         ('up (struct-copy position
+                            current-position
+                            (y (+ (position-y current-position) 1))))
+         ('down (struct-copy position
+                              current-position
+                              (y (- (position-y current-position) 1))))
+         ('left (struct-copy position
+                              current-position
+                              (x (- (position-x current-position) 1))))
+         ('right (struct-copy position
+                               current-position
+                               (x (+ (position-x current-position) 1))))
+         ('stay current-position)))
+     (struct-copy robot-state
+                  rs
+                  (pos next-pos))))
+
 (define (do-tick current-tick)
   (λ (rws)
      (define r (robot-with-state-robot rws))
-     (define next-internal-state
+     (define rs (robot-with-state-state rws))
+     (define robot-decision
        ((robot-on-tick r) (tick-event current-tick)
-                          (robot-with-state-state rws)
+                          rs
                           (robot-with-state-internal-state rws)))
+     (define next-internal-state (car robot-decision))
+     (define action (cadr robot-decision))
      (struct-copy robot-with-state
                   rws
-                  (internal-state next-internal-state))))
+                  (internal-state next-internal-state)
+                  (state ((action->state-update action) rs)))))
 
 (define (advance current-game-state)
   (define current-tick (game-state-tick current-game-state))

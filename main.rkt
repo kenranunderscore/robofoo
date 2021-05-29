@@ -8,13 +8,13 @@
 (define robot-1
   (game:robot (const 0)
               (λ (_event _rs is)
-                 (+ 2 is))
+                 (list (+ 2 is) 'up))
               (game:color 30 150 90)))
 
 (define robot-2
   (game:robot (λ (rs)
                  (game:position-x (game:robot-state-pos rs)))
-              (λ (_event _rs is) is)
+              (λ (_event _rs is) (list is 'right))
               (game:color 0 100 200)))
 
 (define robot-state-1
@@ -36,7 +36,7 @@
 (define (draw-robot renderer rws)
   (let* ((p (game:robot-state-pos (game:robot-with-state-state rws)))
          (color (game:robot-color (game:robot-with-state-robot rws)))
-         (rect (sdl2:make-rect (game:position-x p) (game:position-y p) 20 20)))
+         (rect (sdl2:make-rect (game:position-x p) (game:position-y p) 40 40)))
     (sdl2:set-render-draw-color! renderer
                                  (game:color-r color)
                                  (game:color-g color)
