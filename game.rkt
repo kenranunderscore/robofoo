@@ -39,10 +39,10 @@
        (case action
          ('up (struct-copy position
                             current-position
-                            (y (+ (position-y current-position) 1))))
+                            (y (- (position-y current-position) 1))))
          ('down (struct-copy position
                               current-position
-                              (y (- (position-y current-position) 1))))
+                              (y (+ (position-y current-position) 1))))
          ('left (struct-copy position
                               current-position
                               (x (- (position-x current-position) 1))))
