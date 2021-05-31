@@ -5,17 +5,11 @@
  (prefix-in game: "game.rkt")
  (prefix-in sdl: "sdl.rkt"))
 
-(define robot-1
-  (game:robot (const 0)
-              (λ (_event _rs is)
-                 (list (+ 2 is) 'up))
-              (game:color 30 150 90)))
+(define (load-robot-from-file path)
+  (dynamic-require path 'bot))
 
-(define robot-2
-  (game:robot (λ (rs)
-                 (game:position-x (game:robot-state-pos rs)))
-              (λ (_event _rs is) (list is 'right))
-              (game:color 0 100 200)))
+(define robot-1 (load-robot-from-file "example-robots/robot-1.rkt"))
+(define robot-2 (load-robot-from-file "example-robots/robot-2.rkt"))
 
 (define robot-state-1
   (game:robot-state (game:position 10 10) 100))
