@@ -69,11 +69,13 @@
 (define (main)
   (sdl:with-init!
    '(video)
-   (sdl:with-window!
-    window "abc" 0 0 1024 768 empty
-    (sdl:with-renderer!
-     renderer window
-     (game-loop renderer)
-     (sdl2:destroy-renderer! renderer)))))
+   (sdl:with-image-init!
+    '(png)
+    (sdl:with-window!
+     window "abc" 0 0 1024 768 empty
+     (sdl:with-renderer!
+      renderer window
+      (game-loop renderer)
+      (sdl2:destroy-renderer! renderer))))))
 
 (main)

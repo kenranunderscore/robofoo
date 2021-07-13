@@ -1,6 +1,7 @@
 #lang racket
 
 (provide with-init!
+         with-image-init!
          with-window!
          with-renderer!
          poll-event!
@@ -9,6 +10,7 @@
 
 (require
  (prefix-in sdl2: sdl2/pretty)
+ (prefix-in sdl2-image: sdl2/image/pretty)
  (prefix-in ffi: ffi/unsafe))
 
 ;; FIXME handle return values from SDL2 calls
@@ -37,6 +39,17 @@
     (λ (_)
        (displayln "Quitting SDL…")
        (sdl2:quit!))
+    body ...))
+
+(define-syntax-rule (with-image-init! flags body ...)
+  (with-resource!
+    (λ ()
+       (displayln "Initializing SDL_Image…")
+       (sdl2-image:init! flags)
+       (displayln "SDL_Image initialized"))
+    (λ (_)
+       (displayln "Quitting SDL_Image…")
+       (sdl2-image:quit!))
     body ...))
 
 (define-syntax-rule (with-window! id title x y w h flags body ...)
