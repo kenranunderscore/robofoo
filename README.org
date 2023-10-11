@@ -1,0 +1,9 @@
+#+title: Robofoo
+
+Just a playground to try things out with sandboxed evaluation in Racket, maybe.
+
+Reminder for myself on how to actually run this project:
+
+#+begin_src shell
+racket main.rkt
+#+end_src
