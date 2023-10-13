@@ -56,7 +56,7 @@
   ;; FIXME call/cc!?
   (letrec ((go (λ (current-state)
                  (define event (sdl:poll-event!))
-                 (unless (handle-event event)
+                 (unless (and (not (void? event)) (handle-event event))
                    (sdl2:delay! 20)
                    (sdl2:set-render-draw-color! renderer 30 30 30 255)
                    (sdl2:render-clear! renderer)

@@ -76,8 +76,8 @@
                             ffi:_pointer sdl2:_event*))
 
 (define (poll-event!)
-  (sdl2:poll-event! event-ptr)
-  (ffi:ptr-ref event-ptr sdl2:_event))
+  (unless (zero? (sdl2:poll-event! event-ptr))
+    (ffi:ptr-ref event-ptr sdl2:_event)))
 
 (define (event-type event)
   (ffi:union-ref event 0))
